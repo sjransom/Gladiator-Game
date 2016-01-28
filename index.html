@@ -8,57 +8,91 @@
   <script>
 
   var arena = [];
+  var intervalID = null;
+  var currentIndex = -1;
 
-    function rollDice(howMany, whatType) {
-
+    function rollDice(howMany, whatType) 
+    {
       var result = 0;
       
-      for (var i=0; i<howMany; i++) {
-
+      for (var i=0; i<howMany; i++) 
+      {
         result += Math.floor(Math.random() * whatType) + 1;
-      
       }
       return result;
     }
 
-    function didHit(attacker, defender) {
-      
+    function didHit(attacker, defender) 
+    {
       var toHitNumer = defender.defense  - attacker.attack;
       var roll = rollDice(1, 20);
 
-      if(roll >= toHitNumer) {
+      if(roll >= toHitNumer)
+      {
         return true;
       }
-      else {
+      else
+      {
         return false;
       }
     }
 
-    function calculateDamage(attacker) {
-      
+    function calculateDamage(attacker) 
+    {    
       var damageRoll = attacker.weapon.getDamage();
       return damageRoll;
-
     }
 
-    function handleAttack(attacker, defender) {
-      
+    function handleAttack(attacker, defender)
+    {
+      d(attacker.name + " is attacking " + defender.name);
       var didTheyHit = didHit(attacker, defender);
       
-      if(didTheyHit == true) {
+      if(didTheyHit == true)
+      {
         
         var howMuchDamage = calculateDamage(attacker);
-        defender.hitPoints = howMuchDamage;
+        defender.hitPoints -= howMuchDamage;
+        d("hit for " + howMuchDamage + " points of damage, " + defender.name + " has " + defender.hitPoints + " hit points left.");
         
-        if(defender.hitPoints <= 10) {
+        if(defender.hitPoints <= 0)
+        {
           gameOver(defender);
+          d(defender.name + " has been eliminated.");
         }
-
+      }
+      else
+      {
+        d("missed...");
       }
     }
 
-    function startGame() {
-      
+    function calculateTarget (attacker, arena) 
+    {
+      var copyArena = arena.concat();
+      var myIndex = copyArena.indexOf(attacker);
+      copyArena.splice(myIndex, 1);
+      var sortByLowestHitPoints = function(a, b)
+      {
+        if (a.hitPoints > b.hitPoints)
+        {
+          return 1;
+        }
+        else if (a.hitPoints < b.hitPoints)
+        {
+          return -1;
+        }
+        else 
+        {
+          return 0;
+        }
+      };
+      copyArena.sort(sortByLowestHitPoints);
+      return copyArena[0];
+    }
+
+    function startGame() 
+    {
       var dagger = {
         getDamage: function() {
           return rollDice(1, 4);
@@ -84,18 +118,50 @@
       };
 
       var gladiator1 = {name: "Sam", attack: 2, defense: 10, hitPoints: 10, weapon: dagger};
-      var gladiator2 = {name: "Dave", attack: 4, defense: 12, hitPoints: 14, weapon: claw};
+      var gladiator2 = {name: "Dave", attack: 4, defense: 12, hitPoints: 13, weapon: claw};
       var gladiator3 = {name: "Mark", attack: 1, defense: 14, hitPoints: 10, weapon: halberd};
       var gladiator4 = {name: "Gary", attack: 5, defense: 11, hitPoints: 12, weapon: axe};
 
       arena.push(gladiator1, gladiator2, gladiator3, gladiator4);
+
+      currentIndex = -1;
+      intervalID = setInterval(nextAttack, 3000);
     }
 
-    function gameOver(defender) {
-
+    function gameOver(defender) 
+    {
+      var defendersIndex = arena.indexOf(defender);
+      arena.splice(defendersIndex, 1);
+      if (arena.length <= 1)
+      {
+        clearInterval(intervalID);
+        intervalID = null;
+      }
     }
 
-    function d(o) {
+    function nextAttack()
+    {
+      if (currentIndex < arena.length + 1)
+      {
+        currentIndex++;
+      }
+      else
+      {
+        currentIndex = 0;
+      }
+      if (currentIndex > arena.length -1)
+      {
+        currentIndex = 0;
+      }
+
+      var currentGladiator = arena[currentIndex];
+      d(currentGladiator.name + "'s turn.");
+      var currentDefender = calculateTarget(currentGladiator, arena);
+      handleAttack(currentGladiator, currentDefender);
+    }
+
+    function d(o) 
+    {
       console.log(o);
     }
 
