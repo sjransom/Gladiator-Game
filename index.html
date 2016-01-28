@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gladiators</title>
+</head>
+
+<body>
+  <script>
+
+    function rollDice(howMany, whatType) {
+
+      var result = 0;
+      
+      for (var i=0; i<howMany; i++) {
+
+        result += Math.floor(Math.random() * whatType) + 1;
+      
+      }
+      return result;
+      
+    }
+
+    function didHit(attacker, defender) {
+      var toHitNumer = defender.defense  - attacker.attack;
+      var roll = rollDice(1, 20);
+
+      if(roll >= toHitNumer) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    function calculateDamage(attacker) {
+      var damageRoll = attacker.weapon.getDamage();
+      return damageRoll;
+    }
+
+    function d(o) {
+      console.log(o);
+    }
+
+    var dagger = {
+      getDamage: function() {
+        return rollDice(1, 4);
+      }
+    };
+
+    var claw = {
+      getDamage: function() {
+        return rollDice(1, 3);
+      }
+    };
+
+    var gladiator1 = {name: "Sam", attack: 10, defense: 10, hitPoints: 10, weapon: dagger};
+    var gladiator2 = {name: "Dave", attack: 14, defense: 6, hitPoints: 14, weapon: claw};
+
+    d(didHit(gladiator1, gladiator2));
+    d(didHit(gladiator2, gladiator1));
+
+  </script>
+</body>
+
+</html>
