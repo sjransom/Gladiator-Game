@@ -1,5 +1,6 @@
-# Gladiator-Game
+Coding test for interview #2
+=======
 
-Fun with objects...
+This was another test for a Front End developer role in Sydney, the requirements were to create a game in a couple of hours using vanilla JS.
 
-Just run this in the browser console, type 'arena' to see the winner once the game is over.
+To run just type 'arena' into the browser console, you'll see the winner once the game is over.
